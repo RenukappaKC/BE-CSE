@@ -1,0 +1,49 @@
+#include <lpc214x.h>  // Include the LPC2148 header file
+#include <stdint.h>    // Include standard integer types
+
+// Define the port for the 7-segment display
+#define SEGMENT_PORT IO0PIN  
+
+// Array to hold the segment codes for digits 0-9
+const uint8_t segment_codes[10] = {
+    0x3F, // Code for displaying 0
+    0x06, // Code for displaying 1
+    0x5B, // Code for displaying 2
+    0x4F, // Code for displaying 3
+    0x66, // Code for displaying 4
+    0x6D, // Code for displaying 5
+    0x7D, // Code for displaying 6
+    0x07, // Code for displaying 7
+    0x7F, // Code for displaying 8
+    0x6F  // Code for displaying 9
+};
+
+// Function to create a delay in milliseconds
+void delay_ms(uint32_t delay) {
+    uint32_t i;
+    for (i = 0; i < delay * 1000; i++); // Simple loop for delay
+}
+
+// Function to display a number on the 7-segment display
+void display_number(uint8_t number) {
+    // Clear the upper bits and set the lower 8 bits to the segment code
+    SEGMENT_PORT = (SEGMENT_PORT & 0xFFFFFF00) | segment_codes[number];
+}
+
+int main(void) {
+    uint8_t count = 0; // Variable to hold the current count
+
+    // Set P0.0 to P0.7 as output for the 7-segment display
+    IO0DIR |= 0x000000FF; // Configure P0.0 to P0.7 as output
+
+    while (1) { // Infinite loop
+        display_number(count); // Display the current count on the 7-segment
+        count++; // Increment the count
+        if (count > 9) { // If count exceeds 9
+            count = 0; // Reset count to 0
+        }
+        delay_ms(500); // Wait for 1 second before the next count
+    }
+
+    return 0; // Return from main (not reached in this case)
+}
